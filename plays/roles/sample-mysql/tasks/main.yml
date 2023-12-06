@@ -1,0 +1,8 @@
+---
+# tasks file for sample-mysql
+
+- name: configure the file system
+  import_tasks: filesystem.yml
+
+- name: configure the mariadb 
+  import_tasks: mariadb.yml  

@@ -1,0 +1,21 @@
+---
+- name: Configure SSHD Daemon on all managed hosts
+  hosts: all
+  become: true
+  tasks:
+
+    - name: copy the sshd file to all hosts
+      ansible.builtin.copy:
+        src: sshd_config  
+        dest: /etc/ssh/sshd_config
+        group: root
+        owner: root
+        mode: 644
+      notify:
+        - restart sshd 
+
+  handlers:
+    - name: restart sshd
+      ansible.builtin.service:
+        name: sshd
+        state: restarted    

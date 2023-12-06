@@ -1,0 +1,17 @@
+---
+- name: create a crontab for proxy
+  hosts: proxy
+  become: true
+  tasks:
+    
+    - name: create the crontab file
+      ansible.builtin.cron:
+        name: add date and time
+        weekday: "1-5"
+        minute: "*/2"
+        hour: "9-16"
+        user: automation
+        job: date >> /var/log/time.log
+        cron_file: add-date-time
+        state: present  
+

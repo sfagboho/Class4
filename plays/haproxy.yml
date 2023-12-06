@@ -1,0 +1,15 @@
+---
+- name: create a role
+  hosts: proxy
+  become: yes
+  vars:
+    haproxy_backend_servers:
+      - name: ansible2.hl.local
+        address: 192.168.1.164:80
+      - name: ansible3.hl.local
+        address: 192.168.1.166:80
+
+
+  roles:
+    - haproxy_roles  
+

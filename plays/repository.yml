@@ -1,0 +1,26 @@
+---
+- name: Add repository
+  hosts: database
+  become: true
+  tasks:
+    - name: Add multiple repositories into the same file (1/2)
+      ansible.builtin.yum_repository:
+        name: epel
+        description: Iternal YUM/DNF repo
+        file: epel.repo
+        baseurl: https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+        gpgcheck: true
+        enabled: true
+      notify: 
+        - yum-clean-metadata
+  
+
+    - name: Import a key from a url
+      ansible.builtin.rpm_key:
+        state: present
+        key: https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-9
+
+  handlers:
+    - name: yum-clean-metadata
+      ansible.builtin.command: yum clean metadata
+      

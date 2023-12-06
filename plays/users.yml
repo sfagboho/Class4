@@ -1,0 +1,37 @@
+---
+- name: Create users 
+  hosts: all
+  become: true
+  vars_files:
+    - secret.yml
+    - vars/user_list.yml
+  tasks:
+
+
+    - name: Create users for webservers host group
+      ansible.builtin.user:
+        name: "{{ item.username }}"
+        shell: /bin/bash
+        uid: "{{ item.uid }}"
+        groups: wheel
+        append: yes 
+        password: "{{ user_password | password_hash('sha512') }}"
+        update_password: on_create
+      loop: "{{ users }}"
+      when: inventory_hostname in groups['webservers'] and item.uid is regex('^1.*')
+
+
+
+    - name: Create users for database host group
+      ansible.builtin.user:
+        name: "{{ item.username }}"
+        shell: /bin/bash
+        uid: "{{ item.uid }}"
+        groups: wheel
+        append: yes 
+        password: "{{ user_password | password_hash('sha512') }}"
+        update_password: on_create
+      loop: "{{ users }}"
+      when: 
+        - "'database' in group_names"
+        - item.uid > 2000  

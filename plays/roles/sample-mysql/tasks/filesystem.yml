@@ -1,0 +1,37 @@
+---
+- name: Create the primary partition
+  community.general.parted:
+    device: /dev/sdc
+    number: 1
+    flags: [ lvm ]
+    state: present
+    part_end: 800MiB
+
+- name: Create the volume group vg_database
+  community.general.lvg:
+    vg: vg_database
+    pvs: /dev/sdc1
+
+- name: Create the logical volume
+  community.general.lvol:
+    vg: vg_database
+    lv: lv_mysql
+    size: 512
+
+- name: Create the xfs filesystem
+  community.general.filesystem:
+    fstype: xfs
+    dev: /dev/vg_database/lv_mysql
+
+- name: Create the mount point
+  ansible.builtin.file:
+    path: /mnt/mysql_backups
+    state: directory
+
+- name: Mount permanently the lvm
+  ansible.posix.mount:
+    path: /mnt/mysql_backups
+    src: /dev/vg_database/lv_mysql
+    fstype: xfs
+    state: mounted
+

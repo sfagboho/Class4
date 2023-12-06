@@ -1,0 +1,25 @@
+---
+- name: Ensure automation user is present in all servers
+  hosts: all
+  remote_user: root
+  tasks:
+    
+    - name: Create automation user
+      ansible.builtin.user:
+        name: automation
+        state: present
+        password: "{{ 'devops' | password_hash('sha512' ) }}" 
+
+    - name: Set authorized key taken from file
+      ansible.posix.authorized_key:
+        user: automation
+        state: present
+        key: "{{ lookup('file', '/home/automation/plays/id_rsa.pub') }}"
+
+    - name: setup the sudo access      
+      ansible.builtin.lineinfile:
+        path: /etc/sudoers
+        state: present
+        line: 'automation ALL=(ALL) NOPASSWD: ALL'
+        validate: /usr/sbin/visudo -cf %s
+ 

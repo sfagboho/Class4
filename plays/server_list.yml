@@ -1,0 +1,14 @@
+---
+- name: Create and use Template to create custom files
+  hosts: all
+  become: true
+  tasks:
+    - name: Use the jinja2 file we just created
+      ansible.builtin.template:
+        src: server_list.j2
+        dest: /etc/server_list.txt
+        owner: automation
+        mode: '0600'
+        setype: net_conf_t
+      delegate_to: ansible4.hl.local
+

@@ -1,0 +1,31 @@
+---
+- name: Edit Message of the Day
+  hosts: all
+  become: true
+  tasks:
+
+    - name: Edit content of motd in proxy host group
+      ansible.builtin.copy:
+        content: 'Welcome to HAProxy server'
+        dest: /etc/motd
+      when: inventory_hostname in groups ['proxy']
+
+    - name: Edit content of motd in webservers host group
+      ansible.builtin.copy:
+        content: 'Welcome to Apache server'
+        dest: /etc/motd
+      when: inventory_hostname in groups ['webservers']
+
+    - name: Edit content of motd in database host group
+      ansible.builtin.copy:
+        content: 'Welcome to MySQL server'
+        dest: /etc/motd
+      when: inventory_hostname in groups ['database']
+
+    - name: Edit content of motd in test host group
+      ansible.builtin.copy:
+        content: 'Welcome to test server'
+        dest: /etc/motd
+      when: inventory_hostname in groups ['test']
+
+

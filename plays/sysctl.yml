@@ -1,0 +1,18 @@
+---
+- name: Set the server vm.swapiness
+  become: true
+  hosts: all
+  tasks: 
+    - name: Set vm.swapiness to 10 when RAM > 2048MB
+      ansible.posix.sysctl:
+        name: vm.swappiness
+        value: '10'
+        state: present
+      when: "ansible_memtotal_mb > 2048"
+
+    - name: Report when not enough memory
+      ansible.builtin.assert:
+        that:
+          - ansible_memtotal_mb < 2048
+        success_msg: "Server memory less than 2048"
+

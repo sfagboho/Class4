@@ -1,0 +1,7 @@
+plays/mycollection
+plays/*.log
+plays/*.tar.gz
+
+plays_2/mycollection
+plays_2/*.log
+plays_2/*.tar.gz

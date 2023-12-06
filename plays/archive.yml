@@ -1,0 +1,20 @@
+---
+- name: create archive file
+  hosts: database
+  become: true
+  tasks:
+
+    - name: create the mnt sub directory
+      ansible.builtin.copy:
+        content: 'dev,test,qa,prod'
+        dest: /mnt/mysql_backups/database_list.txt
+
+    
+    - name: create the mysql backups
+      community.general.archive:
+        path: /mnt/mysql_backups/database_list.txt
+        dest: /mnt/mysql_backups/archive.gz
+        format: gz
+        force_archive: true      
+        
+
