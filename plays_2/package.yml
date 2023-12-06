@@ -1,0 +1,27 @@
+---
+- name: installing packages
+  hosts: webservers, test
+  become: true
+  tasks:
+
+    - name: installing development tool packages
+      ansible.builtin.dnf:
+        name:
+          - php
+          - mariadb
+        state: present
+
+
+- name: installing packages
+  hosts: test
+  become: true
+  tasks:
+
+    - name: installing php and mariadb packages
+      ansible.builtin.dnf:
+        name: "{{ item }}"
+        state: latest
+      loop:
+        - "@Development tools"
+        - "*"
+

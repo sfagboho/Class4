@@ -1,0 +1,39 @@
+---
+- name: Create web content
+  hosts: webservers
+  become: true
+  tasks:
+    - name: Create the group named "webdev"
+      ansible.builtin.group:
+        name: webdev
+        state: present
+
+    - name: Create the directory /webdev with its permissions
+      ansible.builtin.file:
+        path: /webdev
+        state: directory
+        group: webdev
+        mode: '2775'
+        recurse: true
+
+    - name: Create a symlink between /webdev and /var/www/html/webdev
+      ansible.builtin.file:
+        src: /webdev
+        dest: /var/www/html/webdev
+        force: true
+        state: link
+
+    - name: Create index.html with content in /webdev
+      ansible.builtin.copy:
+        content: "Development\n"
+        dest: /webdev/index.html 
+
+    - name: Set the selinux context
+      community.general.sefcontext:
+        target: '/webdev(/.*)?'
+        setype: httpd_sys_content_t
+        state: present      
+
+    - name: Restore the selinux context
+      ansible.builtin.command: restorecon -RFv /webdev
+

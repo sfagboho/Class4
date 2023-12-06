@@ -1,0 +1,65 @@
+---
+- name: Create the file system
+  hosts: all
+  become: true
+  tasks: 
+
+    - name: Create a new primary partition with the size of 1G
+
+      community.general.parted:
+        device: /dev/sdc
+        number: 1
+        state: present
+      ignore_errors: true
+
+    - name: Use block for volume group
+      block:
+        - name: create the logical volume research
+          community.general.lvg:
+            vg: research
+            pvs: /dev/sdc1
+
+      rescue:        
+        - name: Print the message for vg research if it defined
+          ansible.builtin.debug: 
+            msg: "research vg does not exist"
+
+    - name: Use block for logical volume
+      block:
+        - name: Create the lv with 1500MiB
+          community.general.lvol:
+            vg: research
+            lv: my_lv
+            size: 1500
+
+      rescue:
+        - name: Display the message
+          ansible.builtin.debug:
+            msg: "Could not create logical volume of that size" 
+
+        - name: Create the lv with 800MiB
+          community.general.lvol:
+            vg: research
+            lv: my_lv
+            size: 800
+
+    - name: Create a file system ext4
+      community.general.filesystem:
+        dev: /dev/research/my_lv
+        fstype: ext4
+        state: present
+
+    - name: create the mount point /data
+      ansible.builtin.file: 
+        path: /data
+        state: directory
+      when: inventory_hostname in groups['proxy']
+
+    - name: mount the filesystem
+      ansible.posix.mount:
+        path: /data
+        src: /dev/research/my_lv
+        fstype: ext4
+        state: mounted
+      when: inventory_hostname in groups['proxy']    
+     

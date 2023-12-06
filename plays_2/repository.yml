@@ -1,0 +1,27 @@
+---
+- name: Create EPEL repository on all managed hosts
+  become: true
+  hosts: all
+  tasks:
+
+    - name: Create EPEL repository
+      ansible.builtin.yum_repository:
+        name: Exam_RHEL
+        description: EX294 software
+        file: software_repo
+        baseurl: https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+        gpgcheck: true
+        enabled: true
+        state: present
+
+    - name: Create GPG key on all managed hosts
+      ansible.builtin.rpm_key:
+        state: present
+        key: https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-9
+      notify: yum clean metadata
+
+  handlers: 
+    - name: yum clean metadata
+      ansible.builtin.command: yum-clean-metadata
+
+  
