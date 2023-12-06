@@ -1,6 +1,6 @@
 ---
 - name: Modifying /etc/issue content 
-  hosts: all
+  hosts: proxy, test, webservers
   become: true
   tasks:
     - name: replace /etc/issue content with Proxy
