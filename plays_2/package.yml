@@ -1,6 +1,6 @@
 ---
 - name: installing packages
-  hosts: webservers, test
+  hosts: test, prod
   become: true
   tasks:
 
